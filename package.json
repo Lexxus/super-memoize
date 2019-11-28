@@ -1,0 +1,51 @@
+{
+  "name": "super-memoize",
+  "version": "1.0.0",
+  "description": "Faster than fast, smaller than micro ... a super speed and tiny size memoizer.",
+  "engines": {},
+  "sideEffects": false,
+  "license": "MIT",
+  "scripts": {
+    "test": "mocha ./test/index.js",
+    "build": ""
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "keywords": [
+    "memoize",
+    "moize",
+    "fast-memoize",
+    "micro-memoize"
+  ],
+  "author": "Oleksii Teterin",
+  "bugs": {
+    "url": "https://github.com/lexxus"
+  },
+  "homepage": "",
+  "devDependencies": {
+    "benchmark": "^2.1.3",
+    "blanket": "^1.2.3",
+    "chai": "^3.4.1",
+    "cli-table2": "^0.2.0",
+    "codacy-coverage": "^2.0.0",
+    "codeclimate-test-reporter": "^0.2.0",
+    "fast-equals": "^1.6.3",
+    "fast-memoize": "^2.5.1",
+    "hash-it": "^4.0.4",
+    "iMemoized": "^1.1.8",
+    "istanbul": "^0.4.2",
+    "lodash": "^4.17.11",
+    "lru-memoize": "^1.1.0",
+    "memoizee": "^0.4.14",
+    "memoizerific": "^1.11.3",
+    "micro-memoize": "^4.0.8",
+    "mocha": "^2.5.3",
+    "moize": "^5.4.4",
+    "nano-memoize": "1.1.7",
+    "ora": "^1.4.0",
+    "underscore": "^1.9.1"
+  },
+  "dependencies": {}
+}
