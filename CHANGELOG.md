@@ -10,4 +10,8 @@
 
 ## 1.0.3 (2020-01-24)
 
-* Add minification.
+* Added minification.
+
+## 1.0.4 (2020-01-24)
+
+* Updated Mocha and Chai libs.

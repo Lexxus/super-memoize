@@ -1,6 +1,6 @@
 {
   "name": "super-memoize",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Faster than fast, smaller than micro ... a super speed and tiny size memoizer.",
   "main": "index.min.js",
   "engines": {},
@@ -28,6 +28,7 @@
   "homepage": "",
   "files": [
     "index.js",
+    "index.min.js",
     "index.d.ts",
     "package.json",
     "CHANGELOG.md"
@@ -54,8 +55,8 @@
     "underscore": "^1.9.1"
   },
   "devDependencies": {
-    "chai": "^3.4.1",
-    "mocha": "^2.5.3",
+    "chai": "^4.2.0",
+    "mocha": "^7.0.0",
     "terser": "^4.6.3",
     "typescript": "^3.7.5"
   },
