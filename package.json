@@ -1,6 +1,6 @@
 {
   "name": "super-memoize",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Faster than fast, smaller than micro ... a super speed and tiny size memoizer.",
   "main": "index.js",
   "engines": {},

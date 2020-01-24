@@ -1,4 +1,6 @@
-export function memoize(fn: Function) {
+type MemoizeResult = (...p: any[]) => any;
+
+export function memoize(fn: Function): MemoizeResult {
   if (fn.length === 1) {
     const wmap = new WeakMap();
     const map: Record<string, any> = {};
