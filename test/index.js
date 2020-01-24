@@ -6,6 +6,16 @@ if (typeof window === "undefined") {
 	chai = require("chai");
 	expect = chai.expect;
 	memoize = require("../index.js").memoize;
+	// memoize = require('nano-memoize'); // 1 failed
+	// memoize = require('fast-memoize'); // 1 failed
+	// memoize = require('lodash').memoize; // passed
+	// memoize = require('../benchmark/addy-osmani'); // passed
+	// memoize = require('memoizerific'); // 7 failing
+	// memoize = require('lru-memoize').default; // 7 failing
+	// memoize = require('moize').default; // passed
+	// memoize = require('micro-memoize') // 2 failed
+	// memoize = require('iMemoized') // 2 failed
+	// memoize = require('underscore').memoize // passed
 }
 
 const singleArg = memoize(function(arg) {
@@ -16,32 +26,27 @@ const multipleArg = memoize(function(arg1, arg2) {
 	return { arg1, arg2 };
 });
 
-const varArg = memoize(function() { return [].slice.call(arguments); });
-
 describe("Test", () => {
 	it("should be faster than original", () => {
 		// Vanilla Fibonacci
 
-		function vanillaFibonacci (n) {
-			return n < 2 ? n : vanillaFibonacci(n - 1) + vanillaFibonacci(n - 2);
-		}
+		let fibonacci = function(n) {
+			return n < 2 ? n : fibonacci(n - 1) + fibonacci(n - 2);
+		};
 
 		const vanillaExecTimeStart = Date.now();
-		vanillaFibonacci(35);
+		fibonacci(35);
 		const vanillaExecTime = Date.now() - vanillaExecTimeStart;
 
 		// Memoized
 
-		let fibonacci = function (n) {
-			return n < 2 ? n : fibonacci(n - 1) + fibonacci(n - 2);
-		}
-
 		fibonacci = memoize(fibonacci);
-		const memoizedFibonacci = fibonacci;
 
-		const memoizedExecTimeStart = Date.now()
-		memoizedFibonacci(35)
-		const memoizedExecTime = Date.now() - memoizedExecTimeStart
+		const memoizedExecTimeStart = Date.now();
+		fibonacci(35);
+		const memoizedExecTime = Date.now() - memoizedExecTimeStart;
+
+		console.log('faster on %dms', vanillaExecTime - memoizedExecTime);
 
 		// Assertion
 
@@ -110,8 +115,44 @@ describe("Test", () => {
 
 	it("multiple arg works with single", () => {
 		const arg1 = {arg:1};
-		result = multipleArg(arg1);
+		const result = multipleArg(arg1);
 
 		expect(result.arg1.arg).to.equal(1);
+	});
+
+	it("should call memoized function 5 times", () => {
+		let runCount = 0;
+		function getFalse(param) {
+			runCount++;
+			switch (param) {
+				case '0':
+					return 0;
+				case 'false':
+					return false;
+				case 'null':
+					return null;
+				case 'undefined':
+					return undefined;
+				default:
+					return param;
+			}
+		}
+		const memoized = memoize(getFalse);
+		const results = [];
+
+		results.push(memoized('0'));
+		results.push(memoized('false'));
+		results.push(memoized('null'));
+		results.push(memoized('undefined'));
+		results.push(memoized('true'));
+
+		results.push(memoized('0'));
+		results.push(memoized('false'));
+		results.push(memoized('null'));
+		results.push(memoized('undefined'));
+		results.push(memoized('true'));
+
+		expect(runCount).to.equal(5);
+		expect(results).to.deep.equal([0, false, null, undefined, 'true', 0, false, null, undefined, 'true']);
 	});
 });

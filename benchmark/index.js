@@ -88,82 +88,121 @@ const onComplete = () => {
   showResults(orderedBenchmarkResults);
 };
 
-const fibonacci = (number) => {
-  return number < 2 ? number : fibonacci(number - 1) + fibonacci(number - 2);
-};
+function getFibonnacciSinglePrimitive(memo) {
+  let fibonacci = function(number) {
+    return number < 2 ? number : fibonacci(number - 1) + fibonacci(number - 2);
+  };
 
-const fibonacciSingleObject = (arg) => {
-  const number = arg.number;
+  // fibonacci = memo(fibonacci);
 
-  if (number < 2) {
-    return number;
-  }
-  arg.number = number - 1;
-  const num1 = fibonacciSingleObject(arg);
-  arg.number = number - 2;
-  const num2 = fibonacciSingleObject(arg);
+  return memo(fibonacci);
+}
 
-  return num1 + num2;
-};
+function getFibonacciSingleObject(memo) {
+  let fibonacci = function({ number }) {
+    return number < 2 ? number : fibonacci({ number: number - 1}) + fibonacci({ number: number - 2});
+  };
 
-const fibonacciMultiplePrimitive = (number, isComplete) => {
-  if (isComplete) {
-    return number;
-  }
+  // fibonacci = memo(fibonacci);
 
-  const firstValue = number - 1;
-  const secondValue = number - 2;
+  return memo(fibonacci);
+}
 
-  return (
-    fibonacciMultiplePrimitive(firstValue, firstValue < 2) + fibonacciMultiplePrimitive(secondValue, secondValue < 2)
-  );
-};
+function getFibonacciMutatedObject(memo) {
+  let fibonacci = function(arg) {
+    const number = arg.number;
 
-const fibonacciMultipleObject = ({ number }, check) => {
-  if (check.isComplete) {
-    return number;
-  }
+    if (number < 2) {
+      return number;
+    }
+    arg.number = number - 1;
+    const num1 = fibonacci(arg);
+    arg.number = number - 2;
+    const num2 = fibonacci(arg);
 
-  const firstValue = { number: number - 1 };
-  const secondValue = { number: number - 2 };
+    return num1 + num2;
+  };
 
-  return (
-    fibonacciMultipleObject(firstValue, {
-      isComplete: firstValue.number < 2
-    }) +
-    fibonacciMultipleObject(secondValue, {
-      isComplete: secondValue.number < 2
-    })
-  );
-};
+  // fibonacci = memo(fibonacci);
 
-const fibonacciMultipleDeepEqual = ({number}) => {
-  return number < 2
-    ? number
-    : fibonacciMultipleDeepEqual({number: number - 1}) + fibonacciMultipleDeepEqual({number: number - 2});
-};
+  return memo(fibonacci);
+}
 
-const runOders = [
-  'nano-memoize',
-  'super-memoize', 
-  'addy-osmani',
-  'lodash',
-  'lru-memoize',
-  'memoizee',
-  'memoizerific',
-  'underscore',
-  'iMemoized',
-  'micro-memoize',
-  'moize',
-  'fast-memoize'
-]
+function getFibonacciMultiplePrimitives(memo) {
+  let fibonacci = function(number, isComplete) {
+    if (isComplete) {
+      return number;
+    }
+    const firstValue = number - 1;
+    const secondValue = number - 2;
 
-function runBenchmark(title, benchmarkSuite, methods) {
+    return (
+      fibonacci(firstValue, firstValue < 2) + fibonacci(secondValue, secondValue < 2)
+    );
+  };
+
+  // fibonacci = memo(fibonacci);
+
+  return memo(fibonacci);
+}
+
+function getFibonacciMultipleObjects(memo) {
+  let fibonacci = function({ number }, check) {
+    if (check.isComplete) {
+      return number;
+    }
+
+    const firstValue = { number: number - 1 };
+    const secondValue = { number: number - 2 };
+
+    return (
+      fibonacci(firstValue, {
+        isComplete: firstValue.number < 2
+      }) +
+      fibonacci(secondValue, {
+        isComplete: secondValue.number < 2
+      })
+    );
+  };
+
+  // fibonacci = memo(fibonacci);
+
+  return memo(fibonacci);
+}
+
+function getFibonacciFunction(memo) {
+  let fibonacci = function(number, getFirstNum, getSecondNum) {
+    return number < 2
+      ? number
+      : fibonacci(getFirstNum(number), getFirstNum, getSecondNum) +
+        fibonacci(getSecondNum(number), getFirstNum, getSecondNum);
+  };
+
+  // fibonacci = memo(fibonacci);
+
+  return memo(fibonacci);
+}
+
+function runBenchmark(title, benchmarkSuite, getFibonacci) {
   const args = [ ...arguments ].slice(3);
+  const methods = {
+    'super-memoize': superMemoize,
+    underscore: underscore,
+    lodash: lodash,
+    memoizee: memoizee,
+    'addy-osmani': addyOsmani,
+    memoizerific: memoizerific(Infinity),
+    'lru-memoize': lruMemoize(Infinity),
+    moize: moize,
+    iMemoized: iMemoized.memoize.bind(iMemoized),
+    'micro-memoize': microMemoize,
+    'fast-memoize': fastMemoize,
+    'nano-memoize': nanomemoize
+  };
 
-  return new Promise((resolve) => {
-    const suite = methods.reduce((acc, method, i) => { 
-      const name = runOders[i];
+  return new Promise((resolve, reject) => {
+    const suite = Object.keys(methods).reduce((acc, name, i) => { 
+      const method = methods[name];
       const params = args.map((arg) => {
         let res;
         if (arg !== null && typeof arg === 'object') {
@@ -178,13 +217,15 @@ function runBenchmark(title, benchmarkSuite, methods) {
         }
         return res;
       });
+      const fibonacci = getFibonacci(method);
 
       return acc.add(name, () => {
-        const result = method.apply(null, params);
+        const result = fibonacci(...params);
 
         if (result !== validResult) {
-          console.error(name + ' failed');
+          // console.error(name + ' failed');
           // throw Error(name + ' failed');
+          reject(` ${name} failed due to wrong result ${result} !== ${validResult}`);
         }
       });
      }, benchmarkSuite);
@@ -213,74 +254,10 @@ const runSingleParameterSuite = () => {
   const fibonacciSuite = new Benchmark.Suite('Single parameter (Primitive)');
   const fibonacciNumber = origNumber;
 
-  const mUnderscore = underscore(fibonacci);
-  const mLodash = lodash(fibonacci);
-  const mMemoizee = memoizee(fibonacci);
-  const mFastMemoize = fastMemoize(fibonacci);
-  const mAddyOsmani = addyOsmani(fibonacci);
-  const mMemoizerific = memoizerific(Infinity)(fibonacci);
-  const mLruMemoize = lruMemoize(Infinity)(fibonacci);
-  const mMoize = moize(fibonacci);
-  const mMicroMemoize = microMemoize(fibonacci);
-  const mIMemoized = iMemoized.memoize(fibonacci);
-  const mNano = nanomemoize(fibonacci);
-  const mSuper = superMemoize(fibonacci);
-
   return runBenchmark(
     'Starting cycles for functions with a single primitive parameter...',
     fibonacciSuite,
-    [
-      mNano,
-      mSuper,
-      mAddyOsmani,
-      mLodash,
-      mLruMemoize,
-      mMemoizee,
-      mMemoizerific,
-      mUnderscore,
-      mIMemoized,
-      mMicroMemoize,
-      mMoize,
-      mFastMemoize
-    ],
-    fibonacciNumber
-  );
-};
-
-const runSingleParameterNumberSuite = () => {
-  const fibonacciSuite = new Benchmark.Suite('Single parameter (Number)');
-  const fibonacciNumber = Number(origNumber);
-
-  const mUnderscore = underscore(fibonacci);
-  const mLodash = lodash(fibonacci);
-  const mMemoizee = memoizee(fibonacci);
-  const mFastMemoize = fastMemoize(fibonacci);
-  const mAddyOsmani = addyOsmani(fibonacci);
-  const mMemoizerific = memoizerific(Infinity)(fibonacci);
-  const mLruMemoize = lruMemoize(Infinity)(fibonacci);
-  const mMoize = moize(fibonacci);
-  const mMicroMemoize = microMemoize(fibonacci);
-  const mIMemoized = iMemoized.memoize(fibonacci);
-  const mNano = nanomemoize(fibonacci,{relaxed:true});
-  const mSuper = superMemoize(fibonacci);
-
-  return runBenchmark(
-    'Starting cycles for functions with a single Number parameter...',
-    fibonacciSuite,
-    [
-      mNano,
-      mSuper,
-      mAddyOsmani,
-      mLodash,
-      mLruMemoize,
-      mMemoizee,
-      mMemoizerific,
-      mUnderscore,
-      mIMemoized,
-      mMicroMemoize,
-      mMoize,
-      mFastMemoize
-    ],
+    getFibonnacciSinglePrimitive,
     fibonacciNumber
   );
 };
@@ -289,36 +266,22 @@ const runSingleParameterObjectSuite = () => {
   const fibonacciSuite = new Benchmark.Suite('Single parameter (Object)');
   const fibonacciNumber = { number: origNumber };
 
-  const mUnderscore = underscore(fibonacciSingleObject);
-  const mLodash = lodash(fibonacciSingleObject);
-  const mMemoizee = memoizee(fibonacciSingleObject);
-  const mFastMemoize = fastMemoize(fibonacciSingleObject);
-  const mAddyOsmani = addyOsmani(fibonacciSingleObject);
-  const mMemoizerific = memoizerific(Infinity)(fibonacciSingleObject);
-  const mLruMemoize = lruMemoize(Infinity)(fibonacciSingleObject);
-  const mMoize = moize(fibonacciSingleObject);
-  const mMicroMemoize = microMemoize(fibonacciSingleObject);
-  const mIMemoized = iMemoized.memoize(fibonacciSingleObject);
-  const mNano = nanomemoize(fibonacciSingleObject,{relaxed:true});
-  const mSuper = superMemoize(fibonacciSingleObject);
-
   return runBenchmark(
     'Starting cycles for functions with a single Object parameter...',
     fibonacciSuite,
-    [
-      mNano,
-      mSuper,
-      mAddyOsmani,
-      mLodash,
-      mLruMemoize,
-      mMemoizee,
-      mMemoizerific,
-      mUnderscore,
-      mIMemoized,
-      mMicroMemoize,
-      mMoize,
-      mFastMemoize
-    ],
+    getFibonacciSingleObject,
+    fibonacciNumber
+  );
+};
+
+const runSingleParameterMutableObjectSuite = () => {
+  const fibonacciSuite = new Benchmark.Suite('Single parameter (Mutated Object)');
+  const fibonacciNumber = { number: origNumber };
+
+  return runBenchmark(
+    'Starting cycles for functions with a single Mutable Object parameter...',
+    fibonacciSuite,
+    getFibonacciMutatedObject,
     fibonacciNumber
   );
 };
@@ -328,36 +291,10 @@ const runMultiplePrimitiveSuite = () => {
   const fibonacciNumber = origNumber;
   const isComplete = false;
 
-  const mUnderscore = underscore(fibonacciMultiplePrimitive);
-  const mLodash = lodash(fibonacciMultiplePrimitive);
-  const mMemoizee = memoizee(fibonacciMultiplePrimitive);
-  const mFastMemoize = fastMemoize(fibonacciMultiplePrimitive);
-  const mAddyOsmani = addyOsmani(fibonacciMultiplePrimitive);
-  const mMemoizerific = memoizerific(Infinity)(fibonacciMultiplePrimitive);
-  const mLruMemoize = lruMemoize(Infinity)(fibonacciMultiplePrimitive);
-  const mMoize = moize(fibonacciMultiplePrimitive);
-  const mMicroMemoize = microMemoize(fibonacciMultiplePrimitive);
-  const mIMemoized = iMemoized.memoize(fibonacciMultiplePrimitive);
-  const mNano = nanomemoize(fibonacciMultiplePrimitive);
-  const mSuper = superMemoize(fibonacciMultiplePrimitive);
-
   return runBenchmark(
     'Starting cycles for functions with multiple parameters that contain only primitives...',
     fibonacciSuite,
-    [
-      mNano,
-      mSuper,
-      mAddyOsmani,
-      mLodash,
-      mLruMemoize,
-      mMemoizee,
-      mMemoizerific,
-      mUnderscore,
-      mIMemoized,
-      mMicroMemoize,
-      mMoize,
-      mFastMemoize
-    ],
+    getFibonacciMultiplePrimitives,
     fibonacciNumber,
     isComplete
   );
@@ -370,60 +307,50 @@ const runMultipleObjectSuite = () => {
     isComplete: false
   };
 
-  const mUnderscore = underscore(fibonacciMultipleObject);
-  const mLodash = lodash(fibonacciMultipleObject);
-  const mMemoizee = memoizee(fibonacciMultipleObject);
-  const mFastMemoize = fastMemoize(fibonacciMultipleObject);
-  const mAddyOsmani = addyOsmani(fibonacciMultipleObject);
-  const mMemoizerific = memoizerific(Infinity)(fibonacciMultipleObject);
-  const mLruMemoize = lruMemoize(Infinity)(fibonacciMultipleObject);
-  const mMoize = moize(fibonacciMultipleObject);
-  const mMicroMemoize = microMemoize(fibonacciMultipleObject);
-  const mIMemoized = iMemoized.memoize(fibonacciMultipleObject);
-  const mNano = nanomemoize(fibonacciMultipleObject);
-  const mSuper = superMemoize(fibonacciMultipleObject);
-  
   return runBenchmark(
     'Starting cycles for functions with multiple parameters that contain objects...',
     fibonacciSuite,
-    [
-      mNano,
-      mSuper,
-      mAddyOsmani,
-      mLodash,
-      mLruMemoize,
-      mMemoizee,
-      mMemoizerific,
-      mUnderscore,
-      mIMemoized,
-      mMicroMemoize,
-      mMoize,
-      mFastMemoize
-    ],
+    getFibonacciMultipleObjects,
     fibonacciNumber,
     isComplete
   );
 };
 
-// runSingleParameterSuite()
-//   .then(runSingleParameterNumberSuite)
-//   .then(runSingleParameterObjectSuite)
-//   .then(runMultiplePrimitiveSuite)
-//   .then(runMultipleObjectSuite);
+const runFunctionSuite = () => {
+  const fibonacciSuite = new Benchmark.Suite('Multiple parameters (Functions)');
+  const fibonacciNumber = origNumber;
+  const getFirstNum = (num) => num - 1;
+  const getSecondNum = (num) => num - 2;
+
+  return runBenchmark(
+    'Starting cycles for functions with multiple parameters that contain functions...',
+    fibonacciSuite,
+    getFibonacciFunction,
+    fibonacciNumber,
+    getFirstNum,
+    getSecondNum
+  );
+};
+
 const benchmarks = [
   runSingleParameterSuite,
-  runSingleParameterNumberSuite,
   runSingleParameterObjectSuite,
+  runSingleParameterMutableObjectSuite,
   runMultiplePrimitiveSuite,
-  runMultipleObjectSuite
+  runMultipleObjectSuite,
+  runFunctionSuite
 ];
+
+function handleError(err) {
+  console.log(err);
+}
 
 benchmarks.reduce((acc, method, i) => {
   if (!processParams.length || processParams.includes(i.toString())) {
     if (acc) {
-      return acc.then(method);
+      return acc.then(method).catch(handleError);
     }
-    return method();
+    return method().catch(handleError);
   }
   return acc;
 }, null);

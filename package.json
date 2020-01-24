@@ -2,12 +2,13 @@
   "name": "super-memoize",
   "version": "1.0.0",
   "description": "Faster than fast, smaller than micro ... a super speed and tiny size memoizer.",
+  "main": "index.js",
   "engines": {},
   "sideEffects": false,
   "license": "MIT",
   "scripts": {
-    "test": "mocha ./test/index.js",
-    "build": ""
+    "build": "tsc -d --lib ES2015 --module umd index.ts",
+    "test": "npm run build && mocha ./test/index.js"
   },
   "repository": {
     "type": "git",
@@ -45,6 +46,7 @@
     "moize": "^5.4.4",
     "nano-memoize": "1.1.7",
     "ora": "^1.4.0",
+    "typescript": "^3.7.5",
     "underscore": "^1.9.1"
   },
   "dependencies": {}
