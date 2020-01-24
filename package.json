@@ -1,6 +1,6 @@
 {
   "name": "super-memoize",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Faster than fast, smaller than micro ... a super speed and tiny size memoizer.",
   "main": "index.js",
   "engines": {},
@@ -25,6 +25,7 @@
     "url": "https://github.com/lexxus"
   },
   "homepage": "",
+  "files": ["index.js", "index.d.ts", "package.json", "CHANGELOG.md"],
   "devDependencies": {
     "benchmark": "^2.1.3",
     "blanket": "^1.2.3",
