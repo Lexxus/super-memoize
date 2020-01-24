@@ -7,3 +7,7 @@
 ## 1.0.2 (2020-01-24)
 
 * Limit files in the package.
+
+## 1.0.3 (2020-01-24)
+
+* Add minification.

@@ -1,13 +1,14 @@
 {
   "name": "super-memoize",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Faster than fast, smaller than micro ... a super speed and tiny size memoizer.",
-  "main": "index.js",
+  "main": "index.min.js",
   "engines": {},
   "sideEffects": false,
   "license": "MIT",
   "scripts": {
     "build": "tsc -d --lib ES2015 --module umd index.ts",
+    "build:min": "npm run build && terser index.js -o index.min.js",
     "test": "npm run build && mocha ./test/index.js"
   },
   "repository": {
@@ -22,14 +23,18 @@
   ],
   "author": "Oleksii Teterin",
   "bugs": {
-    "url": "https://github.com/lexxus"
+    "url": "https://github.com/lexxus/super-memoize"
   },
   "homepage": "",
-  "files": ["index.js", "index.d.ts", "package.json", "CHANGELOG.md"],
-  "devDependencies": {
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "package.json",
+    "CHANGELOG.md"
+  ],
+  "peerDependencies": {
     "benchmark": "^2.1.3",
     "blanket": "^1.2.3",
-    "chai": "^3.4.1",
     "cli-table2": "^0.2.0",
     "codacy-coverage": "^2.0.0",
     "codeclimate-test-reporter": "^0.2.0",
@@ -43,12 +48,16 @@
     "memoizee": "^0.4.14",
     "memoizerific": "^1.11.3",
     "micro-memoize": "^4.0.8",
-    "mocha": "^2.5.3",
     "moize": "^5.4.4",
     "nano-memoize": "1.1.7",
     "ora": "^1.4.0",
-    "typescript": "^3.7.5",
     "underscore": "^1.9.1"
+  },
+  "devDependencies": {
+    "chai": "^3.4.1",
+    "mocha": "^2.5.3",
+    "terser": "^4.6.3",
+    "typescript": "^3.7.5"
   },
   "dependencies": {}
 }
