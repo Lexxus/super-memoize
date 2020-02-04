@@ -15,3 +15,7 @@
 ## 1.0.4 (2020-01-24)
 
 * Updated Mocha and Chai libs.
+
+## 1.0.5 (2020-02-04)
+
+* Changed module to CommonJS (from UMD).
