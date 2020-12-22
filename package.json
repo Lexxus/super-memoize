@@ -1,6 +1,6 @@
 {
   "name": "super-memoize",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Faster than fast, smaller than micro ... a super speed and tiny size memoizer.",
   "main": "index.min.js",
   "types": "index.d.ts",
@@ -54,10 +54,69 @@
     "ora": "^1.4.0",
     "underscore": "^1.9.1"
   },
+  "peerDependenciesMeta": {
+    "benchmark": {
+      "optional": true
+    },
+    "blanket": {
+      "optional": true
+    },
+    "cli-table2": {
+      "optional": true
+    },
+    "codacy-coverage": {
+      "optional": true
+    },
+    "codeclimate-test-reporter": {
+      "optional": true
+    },
+    "fast-equals": {
+      "optional": true
+    },
+    "fast-memoize": {
+      "optional": true
+    },
+    "hash-it": {
+      "optional": true
+    },
+    "iMemoized": {
+      "optional": true
+    },
+    "istanbul": {
+      "optional": true
+    },
+    "lodash": {
+      "optional": true
+    },
+    "lru-memoize": {
+      "optional": true
+    },
+    "memoizee": {
+      "optional": true
+    },
+    "memoizerific": {
+      "optional": true
+    },
+    "micro-memoize": {
+      "optional": true
+    },
+    "moize": {
+      "optional": true
+    },
+    "nano-memoize": {
+      "optional": true
+    },
+    "ora": {
+      "optional": true
+    },
+    "underscore": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "chai": "^4.2.0",
-    "mocha": "^7.0.1",
-    "terser": "^4.6.3",
-    "typescript": "^3.7.5"
+    "mocha": "^8.2.1",
+    "terser": "^5.5.1",
+    "typescript": "^4.1.3"
   }
 }
