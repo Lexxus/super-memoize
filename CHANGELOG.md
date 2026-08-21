@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.1.0 (2026-08-21)
+
+* Replaced TypeScript, Mocha, Chai, and Terser with Bun.
+* Added Biome for linting and formatting.
+* Moved source into `src` and build output into `dist`.
+
 ## 1.0.6 (2020-12-22)
 
 * Updated dependencies.

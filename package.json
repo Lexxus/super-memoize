@@ -1,15 +1,32 @@
 {
   "name": "super-memoize",
-  "version": "1.0.6",
+  "version": "1.1.0",
   "description": "Faster than fast, smaller than micro ... a super speed and tiny size memoizer.",
-  "main": "index.min.js",
-  "types": "index.d.ts",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "unpkg": "./dist/index.min.js",
+  "jsdelivr": "./dist/index.min.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
   "sideEffects": false,
   "license": "MIT",
   "scripts": {
-    "build": "tsc -d --lib ES2015 --module umd index.ts",
-    "build:min": "npm run build && terser index.js -o index.min.js",
-    "test": "npm run build && mocha ./test/index.js"
+    "build": "bun run build:esm && bun run build:cjs && bun run build:min && bun run build:types",
+    "build:esm": "bun build ./src/index.ts --outfile ./dist/index.js --format esm --target browser",
+    "build:cjs": "bun build ./src/index.ts --outfile ./dist/index.cjs --format cjs --minify --target node",
+    "build:min": "bun build ./src/index.ts --outfile ./dist/index.min.js --format esm --minify --target browser",
+    "build:types": "bun -e 'await Bun.write(\"dist/index.d.ts\", await Bun.file(\"src/index.d.ts\").text())'",
+    "test": "bun test",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "prepublishOnly": "bun run build"
   },
   "repository": {
     "type": "git",
@@ -25,98 +42,13 @@
   "bugs": {
     "url": "https://github.com/lexxus/super-memoize"
   },
-  "homepage": "",
+  "homepage": "https://github.com/Lexxus/super-memoize",
   "files": [
-    "index.js",
-    "index.min.js",
-    "index.umd.js",
-    "index.umd.min.js",
-    "index.d.ts"
+    "dist"
   ],
-  "peerDependencies": {
-    "benchmark": "^2.1.3",
-    "blanket": "^1.2.3",
-    "cli-table2": "^0.2.0",
-    "codacy-coverage": "^2.0.0",
-    "codeclimate-test-reporter": "^0.2.0",
-    "fast-equals": "^1.6.3",
-    "fast-memoize": "^2.5.1",
-    "hash-it": "^4.0.4",
-    "iMemoized": "^1.1.8",
-    "istanbul": "^0.4.2",
-    "lodash": "^4.17.11",
-    "lru-memoize": "^1.1.0",
-    "memoizee": "^0.4.14",
-    "memoizerific": "^1.11.3",
-    "micro-memoize": "^4.0.8",
-    "moize": "^5.4.4",
-    "nano-memoize": "1.1.7",
-    "ora": "^1.4.0",
-    "underscore": "^1.9.1"
-  },
-  "peerDependenciesMeta": {
-    "benchmark": {
-      "optional": true
-    },
-    "blanket": {
-      "optional": true
-    },
-    "cli-table2": {
-      "optional": true
-    },
-    "codacy-coverage": {
-      "optional": true
-    },
-    "codeclimate-test-reporter": {
-      "optional": true
-    },
-    "fast-equals": {
-      "optional": true
-    },
-    "fast-memoize": {
-      "optional": true
-    },
-    "hash-it": {
-      "optional": true
-    },
-    "iMemoized": {
-      "optional": true
-    },
-    "istanbul": {
-      "optional": true
-    },
-    "lodash": {
-      "optional": true
-    },
-    "lru-memoize": {
-      "optional": true
-    },
-    "memoizee": {
-      "optional": true
-    },
-    "memoizerific": {
-      "optional": true
-    },
-    "micro-memoize": {
-      "optional": true
-    },
-    "moize": {
-      "optional": true
-    },
-    "nano-memoize": {
-      "optional": true
-    },
-    "ora": {
-      "optional": true
-    },
-    "underscore": {
-      "optional": true
-    }
-  },
   "devDependencies": {
-    "chai": "^4.2.0",
-    "mocha": "^8.2.1",
-    "terser": "^5.5.1",
-    "typescript": "^4.1.3"
+    "@biomejs/biome": "2.5.9",
+    "@types/bun": "1.4.0",
+    "bun": "1.4.0"
   }
 }
